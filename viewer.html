@@ -3,68 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>测评编辑器 - 编辑预览</title>
+<title>测评编辑器</title>
 <script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
 <style>
+  :root {
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --text: #1d1d1f;
+    --sub: #86868b;
+    --line: #e5e5ea;
+    --accent: #0071e3;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f1f4; color: #1d1d1f; height: 100vh; overflow: hidden; }
-  .topbar { height: 52px; background: #fff; border-bottom: 1px solid #e5e6eb; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
-  .topbar .logo { font-weight: 700; font-size: 16px; }
-  .topbar .actions { display: flex; gap: 10px; align-items: center; }
-  .btn { padding: 7px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13.5px; background: #f0f1f4; color: #333; }
-  .btn.primary { background: #4a7dfc; color: #fff; }
-  .btn:hover { opacity: .9; }
-  .meta-bar { height: 56px; background: #fff; border-bottom: 1px solid #e5e6eb; display: flex; align-items: center; gap: 16px; padding: 0 20px; font-size: 13px; }
-  .meta-bar input { border: 1px solid #e0e1e5; border-radius: 6px; padding: 6px 10px; font-size: 13px; width: 160px; }
-  .meta-bar input.avatar { width: 260px; }
-  .main { display: flex; height: calc(100vh - 108px); }
-  .pane { width: 50%; height: 100%; overflow: hidden; }
-  .pane.editor { border-right: 1px solid #e5e6eb; display: flex; flex-direction: column; }
-  .pane-label { height: 30px; background: #f7f8fa; display: flex; align-items: center; padding: 0 14px; font-size: 12px; color: #888; border-bottom: 1px solid #eee; }
-  textarea { flex: 1; border: none; outline: none; resize: none; padding: 18px; font-size: 14px; line-height: 1.8; font-family: Consolas, "PingFang SC", monospace; background: #fff; }
-  .pane.preview { overflow-y: auto; background: #f0f1f4; padding: 24px 16px; }
-  .article { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 36px 44px; box-shadow: 0 2px 16px rgba(0,0,0,.06); position: relative; }
-  .article-head { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 2px solid #f0f0f2; }
-  .avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, #5b8def, #8f6cf0); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; flex-shrink: 0; }
-  .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+  .topbar { height: 48px; background: rgba(255,255,255,.85); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+  .logo { font-size: 14px; font-weight: 600; letter-spacing: -.01em; }
+  .actions { display: flex; gap: 8px; }
+  .btn { padding: 5px 14px; border-radius: 980px; border: none; cursor: pointer; font-size: 13px; background: #e8e8ed; color: var(--text); transition: opacity .15s; }
+  .btn:hover { opacity: .8; }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .meta-bar { height: 52px; background: rgba(255,255,255,.85); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; padding: 0 22px; }
+  .avatar-pick { position: relative; width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: #e8e8ed; flex-shrink: 0; cursor: pointer; }
+  .avatar-pick img, .avatar-pick .fallback { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #5b8def, #8f6cf0); }
+  .avatar-pick input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .meta-bar input { border: none; border-bottom: 1px solid var(--line); background: transparent; padding: 4px 2px; font-size: 13px; width: 140px; outline: none; transition: border-color .15s; }
+  .meta-bar input:focus { border-color: var(--accent); }
+  .meta-bar .sep { width: 1px; height: 18px; background: var(--line); margin: 0 4px; }
+  .main { display: flex; height: calc(100vh - 100px); }
+  .pane { width: 50%; height: 100%; }
+  .pane.editor { border-right: 1px solid var(--line); display: flex; flex-direction: column; background: #fff; }
+  .pane-label { height: 28px; background: var(--bg); display: flex; align-items: center; padding: 0 16px; font-size: 11px; color: var(--sub); border-bottom: 1px solid var(--line); letter-spacing: .02em; }
+  textarea { flex: 1; border: none; outline: none; resize: none; padding: 20px 22px; font-size: 14px; line-height: 1.85; font-family: ui-monospace, SFMono-Regular, Consolas, "PingFang SC", monospace; background: #fff; color: #333; }
+  .pane.preview { overflow-y: auto; background: var(--bg); padding: 28px 20px; position: relative; }
+  .article { max-width: 640px; margin: 0 auto; background: var(--card); border-radius: 18px; padding: 40px 48px; box-shadow: 0 1px 3px rgba(0,0,0,.06); position: relative; }
+  .article-head { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar .fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #5b8def, #8f6cf0); }
   .who { flex: 1; }
-  .who .name { font-size: 15px; font-weight: 700; }
-  .who .time { font-size: 12px; color: #999; margin-top: 2px; }
-  .tag { font-size: 11px; color: #fff; background: #4a7dfc; border-radius: 4px; padding: 2px 8px; }
-  .article h1 { font-size: 26px; line-height: 1.4; margin: 0 0 20px; }
-  .article h2 { font-size: 21px; margin: 32px 0 10px; padding-left: 10px; border-left: 4px solid #5b8def; }
-  .article h3 { font-size: 17px; margin: 22px 0 8px; }
-  .article p { margin: 10px 0; font-size: 15.5px; line-height: 1.9; }
-  .article strong { color: #111; }
-  .article blockquote { border-left: 4px solid #e5e5ea; margin: 14px 0; padding: 6px 14px; background: #fafafa; color: #666; border-radius: 0 8px 8px 0; }
-  .article ul, .article ol { margin: 10px 0 10px 24px; }
-  .article li { margin: 4px 0; line-height: 1.8; }
-  .article code { background: #f1f0f5; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
-  .article img { max-width: 100%; border-radius: 10px; display: block; margin: 16px auto; box-shadow: 0 2px 10px rgba(0,0,0,.1); }
-  .article hr { border: none; border-top: 1px solid #eee; margin: 28px 0; }
-  .watermark { position: fixed; right: 16px; bottom: 12px; font-size: 12px; color: rgba(0,0,0,.14); pointer-events: none; z-index: 999; user-select: none; }
-  .toast { position: fixed; top: 64px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.78); color: #fff; padding: 9px 20px; border-radius: 8px; font-size: 13px; z-index: 1000; display: none; }
+  .who .name { font-size: 14px; font-weight: 600; }
+  .who .time { font-size: 12px; color: var(--sub); margin-top: 2px; }
+  .article h1 { font-size: 26px; line-height: 1.35; margin: 0 0 20px; letter-spacing: -.015em; }
+  .article h2 { font-size: 20px; margin: 34px 0 10px; letter-spacing: -.01em; }
+  .article h3 { font-size: 17px; margin: 24px 0 8px; }
+  .article p { margin: 10px 0; font-size: 15px; line-height: 1.9; color: #333; }
+  .article strong { color: var(--text); font-weight: 600; }
+  .article blockquote { border-left: 3px solid var(--line); margin: 14px 0; padding: 4px 16px; color: var(--sub); }
+  .article ul, .article ol { margin: 10px 0 10px 26px; }
+  .article li { margin: 5px 0; font-size: 15px; line-height: 1.8; color: #333; }
+  .article code { background: #f2f2f4; padding: 2px 6px; border-radius: 6px; font-size: 13px; font-family: ui-monospace, Consolas, monospace; }
+  .article img { max-width: 100%; border-radius: 12px; display: block; margin: 18px auto; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .article hr { border: none; border-top: 1px solid var(--line); margin: 30px 0; }
+  .wm { position: absolute; right: 18px; bottom: 14px; font-size: 12px; color: rgba(0,0,0,.22); letter-spacing: .05em; user-select: none; pointer-events: none; }
+  .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: rgba(29,29,31,.85); color: #fff; padding: 8px 18px; border-radius: 12px; font-size: 13px; z-index: 1000; display: none; }
 </style>
 </head>
 <body>
 <div class="topbar">
-  <div class="logo">📝 测评编辑器</div>
+  <div class="logo">测评编辑器</div>
   <div class="actions">
-    <button class="btn" onclick="loadSample()">载入示例</button>
+    <button class="btn" onclick="loadSample()">示例</button>
     <button class="btn" onclick="copyMd()">复制 Markdown</button>
     <button class="btn primary" onclick="exportMd()">导出 .md</button>
   </div>
 </div>
 <div class="meta-bar">
-  <span>头像 URL</span><input class="avatar" id="avatarUrl" placeholder="留空用首字母头像">
-  <span>作者</span><input id="author" placeholder="作者名">
-  <span>时间</span><input id="date" placeholder="2026-09-14">
-  <span>标签</span><input id="tag" placeholder="软件测评" style="width:110px">
-  <span>水印</span><input id="watermark" placeholder="水印文字" style="width:130px">
+  <label class="avatar-pick" title="点击上传头像">
+    <span class="fallback" id="avatarFallback">文</span>
+    <img id="avatarImg" alt="" style="display:none">
+    <input type="file" id="avatarFile" accept="image/*">
+  </label>
+  <input id="author" placeholder="作者名">
+  <span class="sep"></span>
+  <input id="date" placeholder="时间，如 2026-09-14">
+  <span class="sep"></span>
+  <input id="watermark" placeholder="水印文字" style="width:150px">
 </div>
 <div class="main">
   <div class="pane editor">
-    <div class="pane-label">编辑（Markdown）</div>
+    <div class="pane-label">Markdown</div>
     <textarea id="mdInput" spellcheck="false"></textarea>
   </div>
   <div class="pane preview">
@@ -72,58 +89,48 @@
     <div id="previewArea"></div>
   </div>
 </div>
-<div class="watermark" id="wm"></div>
 <div class="toast" id="toast"></div>
 
 <script>
 const DEFAULT_MD = `# 囤了几千张图的我，被这个工具一天治好
 
-**值得装吗：值得，尤其适合图片重度用户。**
-
-**推荐指数：★★★★☆**（去重有误删风险、会员偏贵，各扣半星）
+**值得装吗：值得，尤其适合图片重度用户。** **推荐指数：★★★★☆**
 
 ---
 
-## 为什么我会用上它
-
-先说说我的病：手机截图、网页存图、设计稿，乱七八糟几千张，找图全靠翻，整理全靠缘分。Pixcall 号称素材管理加本地索引加图片搜索三合一，就试了一下。
+先说说我的病：手机截图、网页存图、设计稿，乱七八糟几千张，找图全靠翻，整理全靠缘分。
 
 ![登录界面](https://pro-test-1447692853.cos.ap-guangzhou.myqcloud.com/images/img-01.jpeg)
 
-重头戏是批量重命名，它不是"按 F2 一个个改"，而是规则化批量重命名，选中一堆文件右键 → 重命名，用"组合"模式任意拼接，确认前就能看到最终文件名。
+重头戏是批量重命名，它不是"按 F2 一个个改"，而是规则化批量重命名，选中一堆文件右键 → 重命名，确认前就能看到最终文件名。
 
 ![重命名序列规则预览](https://pro-test-1447692853.cos.ap-guangzhou.myqcloud.com/images/img-07.png)
 
-槽点也真实：文件去重有误删风险、插件藏得深、会员不便宜。
-
-**适合谁**：设计师、自媒体、囤图党，闭眼入。`;
-
-const SAMPLE_META = { author: "阿鹏", date: "2026-09-14", tag: "软件测评", watermark: "阿鹏出品" };
-const SAMPLE_AVATAR = "";
+槽点也真实：文件去重有误删风险、会员不便宜。`;
 
 marked.setOptions({ breaks: true, gfm: true });
 
 function render() {
   const md = document.getElementById("mdInput").value;
-  const author = document.getElementById("author").value.trim() || "匿名";
-  const date = document.getElementById("date").value.trim() || "";
-  const tag = document.getElementById("tag").value.trim() || "";
-  const avatarUrl = document.getElementById("avatarUrl").value.trim();
+  const author = document.getElementById("author").value.trim() || "作者";
+  const date = document.getElementById("date").value.trim();
+  const wm = document.getElementById("watermark").value.trim();
+  const avatarImg = document.getElementById("avatarImg");
 
-  let html = `<div class="article">`;
-  html += `<div class="article-head">`;
-  if (avatarUrl) {
-    html += `<div class="avatar"><img src="${avatarUrl}" alt=""></div>`;
+  let head;
+  if (avatarImg.src && avatarImg.style.display !== "none") {
+    head = `<div class="avatar"><img src="${avatarImg.src}" alt=""></div>`;
   } else {
-    html += `<div class="avatar">${author[0] || "?"}</div>`;
+    head = `<div class="avatar"><span class="fallback">${author[0] || "文"}</span></div>`;
   }
-  html += `<div class="who"><div class="name">${escapeHtml(author)}</div><div class="time">${escapeHtml(date)}</div></div>`;
-  if (tag) html += `<div class="tag">${escapeHtml(tag)}</div>`;
-  html += `</div>`;
-  html += marked.parse(md);
-  html += `</div>`;
-  document.getElementById("previewArea").innerHTML = html;
-  document.getElementById("wm").textContent = document.getElementById("watermark").value;
+
+  const dateHtml = date ? `<div class="time">${date}</div>` : "";
+  const wmHtml = wm ? `<div class="wm">${escapeHtml(wm)}</div>` : "";
+
+  document.getElementById("previewArea").innerHTML =
+    `<div class="article">` +
+    `<div class="article-head">${head}<div class="who"><div class="name">${escapeHtml(author)}</div>${dateHtml}</div></div>` +
+    marked.parse(md) + wmHtml + `</div>`;
 }
 
 function escapeHtml(s) {
@@ -137,34 +144,45 @@ function toast(msg) {
   setTimeout(() => t.style.display = "none", 1800);
 }
 
+document.getElementById("avatarFile").addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (ev) {
+    document.getElementById("avatarImg").src = ev.target.result;
+    document.getElementById("avatarImg").style.display = "block";
+    document.getElementById("avatarFallback").style.display = "none";
+    render();
+    toast("头像已从本地载入");
+  };
+  reader.readAsDataURL(file);
+});
+
 function loadSample() {
   document.getElementById("mdInput").value = DEFAULT_MD;
-  document.getElementById("author").value = SAMPLE_META.author;
-  document.getElementById("date").value = SAMPLE_META.date;
-  document.getElementById("tag").value = SAMPLE_META.tag;
-  document.getElementById("watermark").value = SAMPLE_META.watermark;
-  document.getElementById("avatarUrl").value = SAMPLE_AVATAR;
+  document.getElementById("author").value = "小编";
+  document.getElementById("date").value = "2026-09-14";
+  document.getElementById("watermark").value = "软件测评出品";
   render();
 }
 
 function copyMd() {
-  const md = document.getElementById("mdInput").value;
-  navigator.clipboard.writeText(md).then(() => toast("Markdown 已复制"));
+  navigator.clipboard.writeText(document.getElementById("mdInput").value)
+    .then(() => toast("Markdown 已复制"));
 }
 
 function exportMd() {
-  const md = document.getElementById("mdInput").value;
-  const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+  const blob = new Blob([document.getElementById("mdInput").value], { type: "text/markdown;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "测评.md";
   a.click();
   URL.revokeObjectURL(a.href);
-  toast("已导出 .md 文件，交给 AI 即可生成可分享页面");
+  toast("已导出 .md，交给 AI 生成分享页");
 }
 
 document.getElementById("mdInput").addEventListener("input", render);
-["avatarUrl", "author", "date", "tag", "watermark"].forEach(id =>
+["author", "date", "watermark"].forEach(id =>
   document.getElementById(id).addEventListener("input", render));
 
 loadSample();
