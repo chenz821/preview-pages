@@ -23,8 +23,8 @@
   .btn:hover { opacity: .8; }
   .btn.primary { background: var(--accent); color: #fff; }
   .meta-bar { height: 52px; background: rgba(255,255,255,.85); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; padding: 0 22px; }
-  .avatar-pick { position: relative; width: 34px; height: 34px; border-radius: 50%; overflow: hidden; background: #e8e8ed; flex-shrink: 0; cursor: pointer; }
-  .avatar-pick img, .avatar-pick .fallback { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #5b8def, #8f6cf0); }
+  .avatar-pick { position: relative; width: 34px; height: 34px; border-radius: 10px; overflow: hidden; background: #e8e8ed; flex-shrink: 0; cursor: pointer; }
+  .avatar-pick img, .avatar-pick .fallback { width: 100%; height: 100%; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #5b8def, #8f6cf0); }
   .avatar-pick input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
   .meta-bar input { border: none; border-bottom: 1px solid var(--line); background: transparent; padding: 4px 2px; font-size: 13px; width: 140px; outline: none; transition: border-color .15s; }
   .meta-bar input:focus { border-color: var(--accent); }
@@ -34,27 +34,30 @@
   .pane.editor { border-right: 1px solid var(--line); display: flex; flex-direction: column; background: #fff; }
   .pane-label { height: 28px; background: var(--bg); display: flex; align-items: center; padding: 0 16px; font-size: 11px; color: var(--sub); border-bottom: 1px solid var(--line); letter-spacing: .02em; }
   textarea { flex: 1; border: none; outline: none; resize: none; padding: 20px 22px; font-size: 14px; line-height: 1.85; font-family: ui-monospace, SFMono-Regular, Consolas, "PingFang SC", monospace; background: #fff; color: #333; }
-  .pane.preview { overflow-y: auto; background: var(--bg); padding: 28px 20px; position: relative; }
-  .article { max-width: 640px; margin: 0 auto; background: var(--card); border-radius: 18px; padding: 40px 48px; box-shadow: 0 1px 3px rgba(0,0,0,.06); position: relative; }
-  .article-head { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
-  .avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .avatar .fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #5b8def, #8f6cf0); }
-  .who { flex: 1; }
-  .who .name { font-size: 14px; font-weight: 600; }
-  .who .time { font-size: 12px; color: var(--sub); margin-top: 2px; }
-  .article h1 { font-size: 26px; line-height: 1.35; margin: 0 0 20px; letter-spacing: -.015em; }
-  .article h2 { font-size: 20px; margin: 34px 0 10px; letter-spacing: -.01em; }
-  .article h3 { font-size: 17px; margin: 24px 0 8px; }
-  .article p { margin: 10px 0; font-size: 15px; line-height: 1.9; color: #333; }
-  .article strong { color: var(--text); font-weight: 600; }
-  .article blockquote { border-left: 3px solid var(--line); margin: 14px 0; padding: 4px 16px; color: var(--sub); }
-  .article ul, .article ol { margin: 10px 0 10px 26px; }
-  .article li { margin: 5px 0; font-size: 15px; line-height: 1.8; color: #333; }
-  .article code { background: #f2f2f4; padding: 2px 6px; border-radius: 6px; font-size: 13px; font-family: ui-monospace, Consolas, monospace; }
-  .article img { max-width: 100%; border-radius: 12px; display: block; margin: 18px auto; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-  .article hr { border: none; border-top: 1px solid var(--line); margin: 30px 0; }
-  .wm { position: absolute; right: 18px; bottom: 14px; font-size: 12px; color: rgba(0,0,0,.22); letter-spacing: .05em; user-select: none; pointer-events: none; }
+  .pane.preview { overflow-y: auto; background: var(--bg); padding: 32px 24px; }
+  .note { max-width: 620px; margin: 0 auto; background: var(--card); border-radius: 22px; box-shadow: 0 2px 8px rgba(0,0,0,.05); overflow: hidden; position: relative; }
+  .note-head { display: flex; align-items: center; gap: 16px; padding: 28px 32px 20px; border-bottom: 1px solid var(--line); }
+  .avatar-lg { width: 64px; height: 64px; border-radius: 22%; overflow: hidden; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
+  .avatar-lg .fb { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #5b8def, #8f6cf0); }
+  .note-who { flex: 1; }
+  .note-who .author { font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
+  .note-who .time { font-size: 13px; color: var(--sub); margin-top: 6px; }
+  .follow { font-size: 13px; font-weight: 600; color: #fff; background: var(--accent); border-radius: 980px; padding: 6px 18px; }
+  .note-body { padding: 26px 32px 40px; }
+  .note-body h1 { font-size: 25px; line-height: 1.35; margin: 0 0 18px; letter-spacing: -.015em; }
+  .note-body h2 { font-size: 19px; margin: 30px 0 10px; letter-spacing: -.01em; }
+  .note-body h3 { font-size: 16px; margin: 22px 0 8px; }
+  .note-body p { margin: 10px 0; font-size: 15px; line-height: 1.9; color: #333; }
+  .note-body strong { color: var(--text); font-weight: 600; }
+  .note-body blockquote { border-left: 3px solid var(--line); margin: 14px 0; padding: 4px 16px; color: var(--sub); }
+  .note-body ul, .note-body ol { margin: 10px 0 10px 26px; }
+  .note-body li { margin: 5px 0; font-size: 15px; line-height: 1.8; color: #333; }
+  .note-body code { background: #f2f2f4; padding: 2px 6px; border-radius: 6px; font-size: 13px; font-family: ui-monospace, Consolas, monospace; }
+  .note-body img { max-width: 100%; border-radius: 14px; display: block; margin: 18px auto; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .note-body hr { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
+  .wm { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; user-select: none; z-index: 2; }
+  .wm span { font-size: 30px; font-weight: 700; color: rgba(0,0,0,.09); letter-spacing: .15em; transform: rotate(-28deg); white-space: nowrap; padding: 10px 30px; border: 2px solid rgba(0,0,0,.07); border-radius: 8px; }
   .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: rgba(29,29,31,.85); color: #fff; padding: 8px 18px; border-radius: 12px; font-size: 13px; z-index: 1000; display: none; }
 </style>
 </head>
@@ -77,7 +80,7 @@
   <span class="sep"></span>
   <input id="date" placeholder="时间，如 2026-09-14">
   <span class="sep"></span>
-  <input id="watermark" placeholder="水印文字" style="width:150px">
+  <input id="watermark" placeholder="水印文字（如 @作者名）" style="width:170px">
 </div>
 <div class="main">
   <div class="pane editor">
@@ -119,18 +122,18 @@ function render() {
 
   let head;
   if (avatarImg.src && avatarImg.style.display !== "none") {
-    head = `<div class="avatar"><img src="${avatarImg.src}" alt=""></div>`;
+    head = `<div class="avatar-lg"><img src="${avatarImg.src}" alt=""></div>`;
   } else {
-    head = `<div class="avatar"><span class="fallback">${author[0] || "文"}</span></div>`;
+    head = `<div class="avatar-lg"><span class="fb">${author[0] || "文"}</span></div>`;
   }
-
-  const dateHtml = date ? `<div class="time">${date}</div>` : "";
-  const wmHtml = wm ? `<div class="wm">${escapeHtml(wm)}</div>` : "";
+  const timeHtml = date ? `<div class="time">${date}</div>` : "";
+  const wmHtml = wm ? `<div class="wm"><span>${escapeHtml(wm)}</span></div>` : "";
 
   document.getElementById("previewArea").innerHTML =
-    `<div class="article">` +
-    `<div class="article-head">${head}<div class="who"><div class="name">${escapeHtml(author)}</div>${dateHtml}</div></div>` +
-    marked.parse(md) + wmHtml + `</div>`;
+    `<div class="note">` +
+    `<div class="note-head">${head}<div class="note-who"><div class="author">${escapeHtml(author)}</div>${timeHtml}</div><div class="follow">关注</div></div>` +
+    `<div class="note-body">${marked.parse(md)}</div>${wmHtml}` +
+    `</div>`;
 }
 
 function escapeHtml(s) {
@@ -162,7 +165,7 @@ function loadSample() {
   document.getElementById("mdInput").value = DEFAULT_MD;
   document.getElementById("author").value = "小编";
   document.getElementById("date").value = "2026-09-14";
-  document.getElementById("watermark").value = "软件测评出品";
+  document.getElementById("watermark").value = "@小编";
   render();
 }
 
@@ -178,7 +181,7 @@ function exportMd() {
   a.download = "测评.md";
   a.click();
   URL.revokeObjectURL(a.href);
-  toast("已导出 .md，交给 AI 生成分享页");
+  toast("已导出 .md，可交给 AI 生成分享页");
 }
 
 document.getElementById("mdInput").addEventListener("input", render);
