@@ -54,11 +54,13 @@
 
   .pane.preview { overflow-y: auto; background: var(--bg); padding: 32px 24px; }
   .note { max-width: 620px; margin: 0 auto; background: var(--card); border-radius: 22px; box-shadow: 0 2px 8px rgba(0,0,0,.05); overflow: hidden; position: relative; }
-  .note.mode-long { max-width: 440px; border-radius: 18px; }
-  .mode-long .note-body { padding: 18px 22px 24px; }
-  .mode-long .note-body h1 { font-size: 21px; }
+  .note.mode-long { width: 440px; height: 587px; border-radius: 18px; margin: 0 auto 22px; display: flex; flex-direction: column; }
+  .mode-long .note-head { flex-shrink: 0; }
+  .mode-long .note-body { flex: 1; overflow: hidden; padding: 16px 22px 12px; }
+  .mode-long .note-body h1 { font-size: 21px; margin-bottom: 12px; }
   .mode-long .note-body p, .mode-long .note-body li { font-size: 14px; }
-  .mode-long .wm { padding: 0 22px 18px; font-size: 11px; }
+  .mode-long .note-body img { max-height: 300px; width: auto; }
+  .mode-long .wm { flex-shrink: 0; padding: 10px 22px 14px; font-size: 11px; }
   .note-head { display: flex; align-items: center; gap: 12px; padding: 16px 24px 12px; border-bottom: 1px solid var(--line); overflow: hidden; }
   .avatar-lg { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,.08); position: relative; }
   .avatar-lg img, .avatar-lg .fb { position: absolute; inset: 0; width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: cover; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #5b8def, #8f6cf0); }
@@ -157,6 +159,8 @@ const DEFAULT_MD = `# 囤了几千张图的我，被这个工具一天治好
 marked.setOptions({ breaks: true, gfm: true });
 
 let currentMode = "wide";
+const PAGE_W = 440;
+const PAGE_H = Math.round((PAGE_W * 4) / 3); // 587, 3:4
 
 function setMode(mode) {
   currentMode = mode;
@@ -165,13 +169,8 @@ function setMode(mode) {
   render();
 }
 
-function render() {
-  const md = document.getElementById("mdInput").value;
-  const author = document.getElementById("author").value.trim() || "作者";
-  const date = document.getElementById("date").value.trim();
-  const wm = document.getElementById("watermark").value.trim();
+function renderHead(author, date) {
   const avatarImg = document.getElementById("avatarImg");
-
   let head;
   if (avatarImg.src && avatarImg.style.display !== "none") {
     head = `<div class="avatar-lg"><img src="${avatarImg.src}" alt=""></div>`;
@@ -179,13 +178,80 @@ function render() {
     head = `<div class="avatar-lg"><span class="fb">${author[0] || "文"}</span></div>`;
   }
   const timeHtml = date ? `<div class="time">${date}</div>` : "";
-  const wmHtml = wm ? `<div class="wm">${escapeHtml(wm)}</div>` : "";
+  return { head, who: `<div class="note-who"><div class="author">${escapeHtml(author)}</div>${timeHtml}</div>` };
+}
 
+function renderWide() {
+  const md = document.getElementById("mdInput").value;
+  const author = document.getElementById("author").value.trim() || "作者";
+  const date = document.getElementById("date").value.trim();
+  const wm = document.getElementById("watermark").value.trim();
+  const { head, who } = renderHead(author, date);
+  const wmHtml = wm ? `<div class="wm">${escapeHtml(wm)}</div>` : "";
   document.getElementById("previewArea").innerHTML =
-    `<div class="note ${currentMode === "long" ? "mode-long" : ""}">` +
-    `<div class="note-head">${head}<div class="note-who"><div class="author">${escapeHtml(author)}</div>${timeHtml}</div><div class="follow">关注</div></div>` +
+    `<div class="note">` +
+    `<div class="note-head">${head}${who}<div class="follow">关注</div></div>` +
     `<div class="note-body">${marked.parse(md)}</div>` + wmHtml +
     `</div>`;
+}
+
+function renderLong() {
+  const md = document.getElementById("mdInput").value;
+  const author = document.getElementById("author").value.trim() || "作者";
+  const date = document.getElementById("date").value.trim();
+  const wm = document.getElementById("watermark").value.trim();
+  const { head, who } = renderHead(author, date);
+
+  // 测量容器（宽 440，与实际卡片一致）
+  const probe = document.createElement("div");
+  probe.style.cssText = `position:absolute;visibility:hidden;left:-9999px;top:0;width:${PAGE_W}px;font-size:15px;line-height:1.9;`;
+  document.body.appendChild(probe);
+
+  // 测量头部高度
+  const headEl = document.createElement("div");
+  headEl.className = "note-head";
+  headEl.innerHTML = head + who + `<div class="follow">关注</div>`;
+  probe.appendChild(headEl);
+  const headH = headEl.offsetHeight;
+
+  // 测量正文（与 .note-body 同 padding）
+  const wrap = document.createElement("div");
+  wrap.style.cssText = `width:${PAGE_W}px;padding:16px 22px 12px;`;
+  probe.appendChild(wrap);
+  wrap.innerHTML = marked.parse(md);
+  const items = Array.from(wrap.children);
+  const usedHeights = items.map(el => el.offsetHeight + 8);
+
+  document.body.removeChild(probe);
+
+  // 分页：超过 PAGE_H 即断开
+  const pages = [];
+  let cur = { head: true, body: [], h: headH + 16 };
+  pages.push(cur);
+  usedHeights.forEach((h, i) => {
+    if (cur.h + h > PAGE_H && cur.body.length > 0) {
+      cur = { head: false, body: [], h: 0 };
+      pages.push(cur);
+    }
+    cur.body.push(items[i]);
+    cur.h += h;
+  });
+
+  // 生成多页卡片
+  let html = "";
+  pages.forEach((pg, idx) => {
+    html += `<div class="note mode-long">`;
+    if (pg.head) html += `<div class="note-head">${head}${who}<div class="follow">关注</div></div>`;
+    html += `<div class="note-body">${pg.body.map(e => e.outerHTML).join("")}</div>`;
+    if (idx === pages.length - 1 && wm) html += `<div class="wm">${escapeHtml(wm)}</div>`;
+    html += `</div>`;
+  });
+  document.getElementById("previewArea").innerHTML = html;
+}
+
+function render() {
+  if (currentMode === "long") renderLong();
+  else renderWide();
 }
 
 function escapeHtml(s) {
