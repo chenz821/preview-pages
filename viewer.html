@@ -70,8 +70,7 @@
   .note-body code { background: #f2f2f4; padding: 2px 6px; border-radius: 6px; font-size: 13px; font-family: ui-monospace, Consolas, monospace; }
   .note-body img { max-width: 100%; height: auto; border-radius: 14px; display: block; margin: 18px auto; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
   .note-body hr { border: none; border-top: 1px solid var(--line); margin: 28px 0; }
-  .wm { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; user-select: none; z-index: 5; }
-  .wm span { font-size: 30px; font-weight: 700; color: rgba(0,0,0,.16); letter-spacing: .15em; transform: rotate(-28deg); white-space: nowrap; padding: 10px 30px; border: 2px solid rgba(0,0,0,.12); border-radius: 8px; }
+  .wm { padding: 0 32px 22px; font-size: 12px; color: rgba(0,0,0,.32); text-align: center; letter-spacing: .02em; user-select: none; }
   .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: rgba(29,29,31,.85); color: #fff; padding: 8px 18px; border-radius: 12px; font-size: 13px; z-index: 1000; display: none; }
 </style>
 </head>
@@ -109,8 +108,8 @@
               <input id="date" placeholder="2026-09-14">
             </div>
             <div class="field">
-              <label for="watermark">水印</label>
-              <input id="watermark" placeholder="@作者名">
+              <label for="watermark">底部水印</label>
+              <input id="watermark" placeholder="留空则不显示，如 @作者名">
             </div>
           </div>
         </div>
@@ -159,12 +158,12 @@ function render() {
     head = `<div class="avatar-lg"><span class="fb">${author[0] || "文"}</span></div>`;
   }
   const timeHtml = date ? `<div class="time">${date}</div>` : "";
-  const wmHtml = wm ? `<div class="wm"><span>${escapeHtml(wm)}</span></div>` : "";
+  const wmHtml = wm ? `<div class="wm">© ${escapeHtml(wm)}</div>` : "";
 
   document.getElementById("previewArea").innerHTML =
     `<div class="note">` +
     `<div class="note-head">${head}<div class="note-who"><div class="author">${escapeHtml(author)}</div>${timeHtml}</div><div class="follow">关注</div></div>` +
-    `<div class="note-body">${marked.parse(md)}</div>${wmHtml}` +
+    `<div class="note-body">${marked.parse(md)}</div>` + wmHtml +
     `</div>`;
 }
 
