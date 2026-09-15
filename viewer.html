@@ -57,9 +57,9 @@
   .note.mode-long { width: 440px; height: 587px; border-radius: 18px; margin: 0 auto 22px; display: flex; flex-direction: column; }
   .mode-long .note-head { flex-shrink: 0; }
   .mode-long .note-body { flex: 1; overflow: hidden; padding: 16px 22px 12px; }
-  .mode-long .note-body h1 { font-size: 21px; margin-bottom: 12px; }
+  .mode-long .note-body h1 { font-size: 20px; margin-bottom: 10px; }
   .mode-long .note-body p, .mode-long .note-body li { font-size: 14px; }
-  .mode-long .note-body img { max-height: 220px; width: auto; }
+  .mode-long .note-body img { max-height: 180px; width: auto; }
   .mode-long .wm { flex-shrink: 0; padding: 10px 22px 12px; font-size: 11px; }
   .page-dots { position: fixed; right: 22px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 9px; z-index: 20; }
   .page-dots span { width: 6px; height: 6px; border-radius: 50%; background: #d0d0d5; transition: background .15s; }
@@ -245,7 +245,7 @@ function renderLong() {
 
   Promise.race([wait, timeout]).then(() => {
     // 插入式分页：逐元素放入真实页容器测量，杜绝估算误差
-    const avail = PAGE_H - 37; // 预留水印空间（精确 37px）
+    const avail = PAGE_H - 33; // 预留水印空间（33px）
     const pages = [];
     let probePage = null;
     let bodyEl = null;
