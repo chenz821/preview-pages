@@ -214,7 +214,26 @@ function renderLong() {
   wrap.style.cssText = `width:${PAGE_W}px;padding:16px 22px 12px;`;
   probe.appendChild(wrap);
   wrap.innerHTML = marked.parse(md);
-  const items = Array.from(wrap.children);
+  let items = Array.from(wrap.children);
+
+  // 超长纯文本段落拆成小段：让文字填满空隙，图片换页时文字留在当前页
+  function makeP(text) {
+    const p = document.createElement("p");
+    p.textContent = text;
+    return p;
+  }
+  items = items.reduce((acc, el) => {
+    const isPlain = el.tagName === "P" && el.children.length === 0 && el.textContent.length > 60;
+    if (!isPlain) { acc.push(el); return acc; }
+    const parts = el.textContent.match(/[^。！？!?\n]+[。！？!?]?/g) || [el.textContent];
+    let buf = "";
+    parts.forEach(p => {
+      if ((buf + p).length > 90 && buf) { acc.push(makeP(buf)); buf = p; }
+      else buf += p;
+    });
+    if (buf) acc.push(makeP(buf));
+    return acc;
+  }, []);
 
   // 等图片加载完再分页（否则高度算错）
   const imgs = wrap.querySelectorAll("img");
@@ -226,7 +245,7 @@ function renderLong() {
 
   Promise.race([wait, timeout]).then(() => {
     // 插入式分页：逐元素放入真实页容器测量，杜绝估算误差
-    const avail = PAGE_H - 34; // 预留水印空间
+    const avail = PAGE_H - 37; // 预留水印空间（精确 37px）
     const pages = [];
     let probePage = null;
     let bodyEl = null;
@@ -245,11 +264,10 @@ function renderLong() {
 
     newProbe(true);
     items.forEach(el => {
-      const before = probePage.offsetHeight;
       bodyEl.appendChild(el);
       const after = probePage.offsetHeight;
-      if (after > avail && bodyEl.childElementCount > 1) {
-        // 超了，回退这个元素，换新页
+      if (after > avail) {
+        // 超了：回退该元素，换新页继续放（允许单元素一页，不强制留当前页）
         bodyEl.removeChild(el);
         document.body.removeChild(probePage);
         newProbe(false);
