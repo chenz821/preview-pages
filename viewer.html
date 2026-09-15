@@ -267,15 +267,31 @@ function renderLong() {
       bodyEl.appendChild(el);
       const after = probePage.offsetHeight;
       if (after > avail) {
-        // 超了：回退该元素，换新页继续放（允许单元素一页，不强制留当前页）
+        // 超限：回退
         bodyEl.removeChild(el);
+        let goWith = null;
+        // 关键：图片超限时，把前面一段文字一起带走（图文同页混排，避免孤图页）
+        if (el.querySelector("img")) {
+          const prev = cur.items[cur.items.length - 1];
+          if (prev && prev !== el && !prev.querySelector("img")) {
+            goWith = prev;
+            bodyEl.removeChild(goWith);
+            cur.items.pop();
+          }
+        }
         document.body.removeChild(probePage);
         newProbe(false);
-        bodyEl.appendChild(el);
         cur = { head: false, items: [] };
         pages.push(cur);
+        if (goWith) {
+          bodyEl.appendChild(goWith);
+          cur.items.push(goWith);
+        }
+        bodyEl.appendChild(el);
+        cur.items.push(el);
+      } else {
+        cur.items.push(el);
       }
-      cur.items.push(el);
     });
     document.body.removeChild(probePage);
 
