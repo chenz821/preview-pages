@@ -71,7 +71,7 @@
   .page-dots { position: fixed; right: 22px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 9px; z-index: 20; }
   .page-dots span { width: 6px; height: 6px; border-radius: 50%; background: #d0d0d5; transition: background .15s; }
   .page-dots span.active { background: #1d1d1f; }
-  .note-head { display: flex; align-items: center; gap: 12px; padding: 16px 24px 12px; border-bottom: 1px solid var(--line); overflow: hidden; }
+  .note-head { display: flex; align-items: center; gap: 12px; padding: 16px 24px 12px; overflow: hidden; }
   .avatar-lg { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; flex-shrink: 0; position: relative; padding: 2px; background: #fff; box-shadow: 0 0 0 1px var(--line), 0 1px 3px rgba(0,0,0,.08); }
   .avatar-lg img, .avatar-lg .fb { position: absolute; inset: 2px; width: calc(100% - 4px); height: calc(100% - 4px); max-width: calc(100% - 4px); max-height: calc(100% - 4px); object-fit: cover; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #5b8def, #8f6cf0); }
   .note-who { flex: 1; min-width: 0; }
@@ -187,9 +187,10 @@ function renderHead(author, date) {
   } else {
     head = `<div class="avatar-lg"><span class="fb">${author[0] || "文"}</span></div>`;
   }
-  // 参考站风格副行：@作者名 · 时间（用户ID样式）
-  const sub = "@" + author + (date ? " · " + date : "");
-  const who = `<div class="note-who"><div class="author">${escapeHtml(author)}</div><div class="id">${escapeHtml(sub)}</div></div>`;
+  // 副行只保留时间（去掉 @作者 ID 样式）
+  const sub = date || "";
+  const idHtml = sub ? `<div class="id">${escapeHtml(sub)}</div>` : "";
+  const who = `<div class="note-who"><div class="author">${escapeHtml(author)}</div>${idHtml}</div>`;
   return { head, who };
 }
 
