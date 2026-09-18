@@ -63,9 +63,10 @@
   .note.mode-long { width: 440px; height: 587px; border-radius: 18px; margin: 0 auto 22px; display: flex; flex-direction: column; }
   .mode-long .note-head { flex-shrink: 0; }
   .mode-long .note-body { flex: 1; overflow: hidden; padding: 16px 22px 12px; }
-  .mode-long .note-body h1 { font-size: 20px; margin-bottom: 10px; }
-  .mode-long .note-body p, .mode-long .note-body li { font-size: 14px; }
-  .mode-long .note-body img { max-width: 100%; max-height: 280px; height: auto; width: auto; display: block; margin: 10px auto; border-radius: 12px; }
+  .mode-long .note-body h1 { font-size: 20px; margin: 0 0 8px; }
+  .mode-long .note-body p, .mode-long .note-body li, .mode-long .note-body blockquote,
+  .mode-long .note-body h2, .mode-long .note-body h3, .mode-long .note-body ul, .mode-long .note-body ol { margin: 8px 0; font-size: 14px; }
+  .mode-long .note-body img { max-width: 100%; max-height: 280px; height: auto; width: auto; display: block; margin: 8px auto; border-radius: 12px; }
   .mode-long .wm { flex-shrink: 0; padding: 10px 22px 12px; font-size: 11px; }
   .page-dots { position: fixed; right: 22px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 9px; z-index: 20; }
   .page-dots span { width: 6px; height: 6px; border-radius: 50%; background: #d0d0d5; transition: background .15s; }
@@ -237,7 +238,7 @@ function renderLong() {
     const parts = el.textContent.match(/[^。！？!?\n]+[。！？!?]?/g) || [el.textContent];
     let buf = "";
     parts.forEach(p => {
-      if ((buf + p).length > 90 && buf) { acc.push(makeP(buf)); buf = p; }
+      if ((buf + p).length > 60 && buf) { acc.push(makeP(buf)); buf = p; }
       else buf += p;
     });
     if (buf) acc.push(makeP(buf));
@@ -254,7 +255,7 @@ function renderLong() {
 
   Promise.race([wait, timeout]).then(() => {
     // 插入式分页：逐元素放入真实页容器测量，杜绝估算误差
-    const avail = PAGE_H - 33; // 预留水印空间（33px）
+    const avail = PAGE_H - 30; // 预留水印空间（30px），页面尽量排满
     const pages = [];
     let probePage = null;
     let bodyEl = null;
